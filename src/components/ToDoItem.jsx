@@ -1,13 +1,13 @@
 import React from "react";
 
-function ToDoItem(props) {
+const ToDoItem = ({id, text: onAdd="Nuevo To Do", onChecked}) => {
   return (
     <div
-      onClick={() => {
-        props.onChecked(props.id);
+      onClick={ () => {
+        onChecked(id);
       }}
     >
-      <li>{props.text}</li>
+      <li>{onAdd}</li>
     </div>
   );
 }
