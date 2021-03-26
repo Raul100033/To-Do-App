@@ -20,8 +20,13 @@ const App = () => {
   };
 
   //asdas
+<<<<<<< HEAD
+  const addItem = (newItem) => {
+    setItems((prevItems) => [...prevItems, newItem]);
+=======
   const addItem = () => {
     setItems((prevItems) => [...prevItems, inputText]);
+>>>>>>> master
     setInputText('');
   };
 
@@ -36,7 +41,15 @@ const App = () => {
       </Heading>
       <div className="form">
         <Input onChange={handleChange} type="text" value={inputText} />
+<<<<<<< HEAD
+        <Button
+          onClick={() => {
+            addItem(inputText);
+          }}
+        >
+=======
         <Button onClick={addItem}>
+>>>>>>> master
           <Span>Add</Span>
         </Button>
       </div>
@@ -49,6 +62,10 @@ const App = () => {
               text={todoItem}
               onChecked={deleteItem}
               updateItem={updateItem}
+<<<<<<< HEAD
+              addItem={addItem}
+=======
+>>>>>>> master
             />
           ))}
         </ul>
