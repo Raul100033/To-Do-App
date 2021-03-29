@@ -1,16 +1,30 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import imagenes from '../media/img.tsx';
+
+// let imageIndex = Math.floor(Math.random() * imagenes.length);
 
 const ToDoItem = ({ id, text: addText, onChecked, updateItem, addItem }) => {
   const [inputText, setInputText] = useState(addText);
   const [isEditing, setIsEditing] = useState(false);
+  const [img, setImg] = useState('');
 
   const edit = (event) => {
     setInputText(event.target.value);
   };
 
+  const imageIndex = React.useMemo(
+    () => Math.floor(Math.random() * imagenes.length),
+    []
+  );
+
+  const urlImage = (event) => {
+    setImg(event.target.value);
+  };
+
   return (
-    <div
+    <MainDiv
+      background={img || imagenes[imageIndex]}
       onClick={() => {
         onChecked(id);
       }}
@@ -35,17 +49,19 @@ const ToDoItem = ({ id, text: addText, onChecked, updateItem, addItem }) => {
               event.preventDefault();
             }}
           />{' '}
-          <button
+          <Button
             onClick={() => {
               addItem(inputText);
               setIsEditing(false);
             }}
           >
+            {console.log(img, imagenes)}
             Done{' '}
-          </button>{' '}
+          </Button>{' '}
+          <input type="text" onChange={urlImage} value={img} />
         </div>
       )}
-    </div>
+    </MainDiv>
   );
 };
 
@@ -73,6 +89,11 @@ const Input = styled.input`
   margin-bottom: 20px;
 `;
 
+const InputImage = styled.input`
+  box-sizing: border-box;
+  background-color: transparent;
+`;
+
 const Button = styled.button`
   padding: 0;
   border: none;
@@ -81,4 +102,8 @@ const Button = styled.button`
   padding-bottom: 3px;
   border-radius: 5px;
   background-color: #ffeaa7;
+`;
+
+const MainDiv = styled.div`
+  background-image: url(${({ background }) => background.toString()});
 `;
