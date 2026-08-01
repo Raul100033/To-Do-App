@@ -1,100 +1,114 @@
-import React, { useState } from 'react';
-import ToDoItem from './ToDoItem';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import TodoForm from './TodoForm';
+import TodoList from './TodoList';
+
+const STORAGE_KEY = 'todos';
+
+const createId = () =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+const loadTodos = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return Array.isArray(stored) ? stored : [];
+  } catch {
+    return [];
+  }
+};
 
 const App = () => {
-  const [inputText, setInputText] = useState('');
-  const [items, setItems] = useState([]);
+  const [todos, setTodos] = useState(loadTodos);
 
-  const handleChange = (event) => {
-    const newValue = event.target.value;
-    setInputText(newValue);
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+  }, [todos]);
+
+  const addTodo = (text) => {
+    setTodos((prev) => [...prev, { id: createId(), text, completed: false }]);
   };
 
-  const updateItem = (index, newItemValue) => {
-    setItems((prevItems) =>
-      prevItems.map((item, currentIndex) =>
-        currentIndex === index ? newItemValue : item
+  const updateTodo = (id, text) => {
+    setTodos((prev) =>
+      prev.map((todo) => (todo.id === id ? { ...todo, text } : todo))
+    );
+  };
+
+  const toggleTodo = (id) => {
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     );
   };
 
-  //asdas
-  const addItem = (newItem) => {
-    setItems((prevItems) => [...prevItems, newItem]);
-    setInputText('');
+  const deleteTodo = (id) => {
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
   };
 
-  const deleteItem = (id) => {
-    setItems((prevItems) => prevItems.filter((item, index) => index !== id));
+  const clearCompleted = () => {
+    setTodos((prev) => prev.filter((todo) => !todo.completed));
   };
+
+  const activeCount = todos.filter((todo) => !todo.completed).length;
+  const hasCompleted = todos.length > activeCount;
 
   return (
     <Container>
       <Heading>
         <H1>To-Do List</H1>
       </Heading>
-      <div className="form">
-        <Input onChange={handleChange} type="text" value={inputText} />
-        <Button
-          onClick={() => {
-            addItem(inputText);
-          }}
-        >
-          <Span>Add</Span>
-        </Button>
-      </div>
-      <div>
-        <ul>
-          {items.map((todoItem, index) => (
-            <ToDoItem
-              key={index}
-              id={index}
-              text={todoItem}
-              onChecked={deleteItem}
-              updateItem={updateItem}
-              addItem={addItem}
-            />
-          ))}
-        </ul>
-      </div>
+      <TodoForm onAdd={addTodo} />
+      <TodoList
+        todos={todos}
+        onToggle={toggleTodo}
+        onUpdate={updateTodo}
+        onDelete={deleteTodo}
+      />
+      {todos.length > 0 && (
+        <Footer>
+          <Count>
+            {activeCount} task{activeCount === 1 ? '' : 's'} left
+          </Count>
+          {hasCompleted && (
+            <ClearButton type="button" onClick={clearCompleted}>
+              Clear completed
+            </ClearButton>
+          )}
+        </Footer>
+      )}
     </Container>
   );
 };
 
 export default App;
 
-const Button = styled.button`
-  padding: 0;
+const Footer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border-top: dashed 3px #fdcb6e;
+  font-size: 0.9rem;
+`;
+
+const Count = styled.span`
+  color: hsla(260, 2%, 25%, 0.7);
+`;
+
+const ClearButton = styled.button`
   border: none;
   font-family: 'Architects Daughter', cursive;
-  text-decoration: none;
-  padding-bottom: 3px;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 5px;
   background-color: #ffeaa7;
-`;
-
-const Span = styled.span`
-  background: #f1f5f8;
-  display: block;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  border: 2px solid hsl(198, 1%, 29%);
-`;
-
-const Input = styled.input`
-  box-sizing: border-box;
-  background-color: transparent;
-  padding: 0.7rem;
-  border-bottom-right-radius: 15px 3px;
-  border-bottom-left-radius: 3px 15px;
-  border: solid 3px transparent;
-  border-bottom: dashed 3px #fdcb6e;
-  font-family: 'Architects Daughter', cursive;
-  font-size: 1rem;
-  color: hsla(260, 2%, 25%, 0.7);
-  width: 70%;
-  margin-bottom: 20px;
+  color: hsl(198, 1%, 29%);
+  cursor: pointer;
 `;
 
 const Heading = styled.div`
