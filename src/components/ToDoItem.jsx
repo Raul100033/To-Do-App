@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import imagenes from '../media/img.tsx';
+import imagenes from '../media/img';
 
-// let imageIndex = Math.floor(Math.random() * imagenes.length);
-
-const ToDoItem = ({ id, text: addText, onChecked, updateItem, addItem }) => {
+const ToDoItem = ({ id, text: addText, image, onChecked, updateItem }) => {
   const [inputText, setInputText] = useState(addText);
   const [isEditing, setIsEditing] = useState(false);
-  const [img, setImg] = useState('');
+  const [img, setImg] = useState(image || '');
 
   const edit = (event) => {
     setInputText(event.target.value);
@@ -34,7 +32,6 @@ const ToDoItem = ({ id, text: addText, onChecked, updateItem, addItem }) => {
           onContextMenu={(event) => {
             event.preventDefault();
             setIsEditing(true);
-            // updateItem(id, id);
           }}
         >
           {addText}
@@ -49,16 +46,20 @@ const ToDoItem = ({ id, text: addText, onChecked, updateItem, addItem }) => {
               event.preventDefault();
             }}
           />{' '}
+          <InputImage
+            type="text"
+            onChange={urlImage}
+            value={img}
+            placeholder="Image URL"
+          />{' '}
           <Button
             onClick={() => {
-              addItem(inputText);
+              updateItem(id, { text: inputText, image: img });
               setIsEditing(false);
             }}
           >
-            {console.log(img, imagenes)}
             Done{' '}
-          </Button>{' '}
-          <input type="text" onChange={urlImage} value={img} />
+          </Button>
         </div>
       )}
     </MainDiv>

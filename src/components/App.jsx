@@ -4,11 +4,16 @@ import styled from 'styled-components';
 
 const App = () => {
   const [inputText, setInputText] = useState('');
+  const [imageInput, setImageInput] = useState('');
   const [items, setItems] = useState([]);
 
   const handleChange = (event) => {
     const newValue = event.target.value;
     setInputText(newValue);
+  };
+
+  const handleImageChange = (event) => {
+    setImageInput(event.target.value);
   };
 
   const updateItem = (index, newItemValue) => {
@@ -19,10 +24,10 @@ const App = () => {
     );
   };
 
-  //asdas
-  const addItem = (newItem) => {
-    setItems((prevItems) => [...prevItems, newItem]);
+  const addItem = (text, image) => {
+    setItems((prevItems) => [...prevItems, { text, image: image || null }]);
     setInputText('');
+    setImageInput('');
   };
 
   const deleteItem = (id) => {
@@ -36,9 +41,15 @@ const App = () => {
       </Heading>
       <div className="form">
         <Input onChange={handleChange} type="text" value={inputText} />
+        <Input
+          onChange={handleImageChange}
+          type="text"
+          value={imageInput}
+          placeholder="Image URL (optional)"
+        />
         <Button
           onClick={() => {
-            addItem(inputText);
+            addItem(inputText, imageInput);
           }}
         >
           <Span>Add</Span>
@@ -50,10 +61,10 @@ const App = () => {
             <ToDoItem
               key={index}
               id={index}
-              text={todoItem}
+              text={todoItem.text}
+              image={todoItem.image}
               onChecked={deleteItem}
               updateItem={updateItem}
-              addItem={addItem}
             />
           ))}
         </ul>
