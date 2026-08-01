@@ -3,13 +3,15 @@ import styled from 'styled-components';
 
 const TodoForm = ({ onAdd }) => {
   const [inputText, setInputText] = useState('');
+  const [imageInput, setImageInput] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const text = inputText.trim();
     if (!text) return;
-    onAdd(text);
+    onAdd(text, imageInput.trim() || null);
     setInputText('');
+    setImageInput('');
   };
 
   return (
@@ -20,6 +22,13 @@ const TodoForm = ({ onAdd }) => {
         value={inputText}
         placeholder="Add a task..."
         aria-label="New task"
+      />
+      <Input
+        onChange={(event) => setImageInput(event.target.value)}
+        type="text"
+        value={imageInput}
+        placeholder="Image URL (optional)"
+        aria-label="New task image URL"
       />
       <Button type="submit">
         <Span>Add</Span>

@@ -1,23 +1,41 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import imagenes from '../media/img';
 
-const ToDoItem = ({ id, text, completed, onToggle, onUpdate, onDelete }) => {
+const ToDoItem = ({
+  id,
+  text,
+  completed,
+  image,
+  onToggle,
+  onUpdate,
+  onDelete,
+}) => {
   const [inputText, setInputText] = useState(text);
+  const [imgInput, setImgInput] = useState(image || '');
   const [isEditing, setIsEditing] = useState(false);
+
+  const imageIndex = React.useMemo(
+    () => Math.floor(Math.random() * imagenes.length),
+    []
+  );
+  const backgroundImage = image || imagenes[imageIndex];
 
   const startEditing = () => {
     setInputText(text);
+    setImgInput(image || '');
     setIsEditing(true);
   };
 
   const save = () => {
     const newText = inputText.trim();
-    if (newText) onUpdate(id, newText);
+    if (newText) onUpdate(id, newText, imgInput || null);
     setIsEditing(false);
   };
 
   const cancel = () => {
     setInputText(text);
+    setImgInput(image || '');
     setIsEditing(false);
   };
 
@@ -28,7 +46,7 @@ const ToDoItem = ({ id, text, completed, onToggle, onUpdate, onDelete }) => {
 
   if (isEditing) {
     return (
-      <Li>
+      <Li background={backgroundImage}>
         <Input
           autoFocus
           type="text"
@@ -36,6 +54,14 @@ const ToDoItem = ({ id, text, completed, onToggle, onUpdate, onDelete }) => {
           onChange={(event) => setInputText(event.target.value)}
           onKeyDown={handleKeyDown}
           aria-label="Edit task"
+        />
+        <InputImage
+          type="text"
+          value={imgInput}
+          onChange={(event) => setImgInput(event.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Image URL"
+          aria-label="Edit task image URL"
         />
         <Actions>
           <SmallButton type="button" onClick={save}>
@@ -50,7 +76,7 @@ const ToDoItem = ({ id, text, completed, onToggle, onUpdate, onDelete }) => {
   }
 
   return (
-    <Li>
+    <Li background={backgroundImage}>
       <Label>
         <Checkbox
           type="checkbox"
@@ -86,7 +112,12 @@ const Li = styled.li`
   position: relative;
   padding: 0.5rem;
   outline: none;
+  border-radius: 8px;
+  background-image: url(${({ background }) => background});
+  background-size: cover;
+  background-position: center;
 `;
+
 
 const Label = styled.label`
   display: flex;
@@ -140,3 +171,17 @@ const Input = styled.input`
   flex: 1;
   min-width: 0;
 `;
+
+const InputImage = styled.input`
+  box-sizing: border-box;
+  background-color: transparent;
+  padding: 0.4rem;
+  border: solid 3px transparent;
+  border-bottom: dashed 3px #fdcb6e;
+  font-family: 'Architects Daughter', cursive;
+  font-size: 0.9rem;
+  color: hsla(260, 2%, 25%, 0.7);
+  flex: 1;
+  min-width: 0;
+`;
+

@@ -26,13 +26,16 @@ const App = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
   }, [todos]);
 
-  const addTodo = (text) => {
-    setTodos((prev) => [...prev, { id: createId(), text, completed: false }]);
+  const addTodo = (text, image) => {
+    setTodos((prev) => [
+      ...prev,
+      { id: createId(), text, completed: false, image: image || null },
+    ]);
   };
 
-  const updateTodo = (id, text) => {
+  const updateTodo = (id, text, image) => {
     setTodos((prev) =>
-      prev.map((todo) => (todo.id === id ? { ...todo, text } : todo))
+      prev.map((todo) => (todo.id === id ? { ...todo, text, image } : todo))
     );
   };
 

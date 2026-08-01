@@ -15,6 +15,7 @@ const TodoList = ({ todos, onToggle, onUpdate, onDelete }) => {
           id={todo.id}
           text={todo.text}
           completed={todo.completed}
+          image={todo.image}
           onToggle={onToggle}
           onUpdate={onUpdate}
           onDelete={onDelete}
