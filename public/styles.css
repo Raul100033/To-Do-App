@@ -10,4 +10,11 @@ body {
   font-family: 'Architects Daughter', cursive;
   text-align: center;
   font-size: 130%;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+body.dark-mode {
+  background-color: #2d3436;
+  color: #dfe6e9;
+}
+
