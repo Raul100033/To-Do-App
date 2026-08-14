@@ -1,35 +1,82 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { readFileAsDataURL } from '../utils/file';
 
 const TodoForm = ({ onAdd }) => {
   const [inputText, setInputText] = useState('');
-  const [imageInput, setImageInput] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [uploadedImage, setUploadedImage] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [previewError, setPreviewError] = useState(false);
+
+  const previewSrc = uploadedImage || imageUrl;
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const text = inputText.trim();
     if (!text) return;
-    onAdd(text, imageInput.trim() || null);
+    const image = uploadedImage || imageUrl.trim() || null;
+    onAdd(text, image, dueDate || null);
     setInputText('');
-    setImageInput('');
+    setImageUrl('');
+    setUploadedImage('');
+    setDueDate('');
+    setPreviewError(false);
+  };
+
+  const handleImageUrlChange = (event) => {
+    setImageUrl(event.target.value);
+    setUploadedImage('');
+    setPreviewError(false);
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const dataUrl = await readFileAsDataURL(file);
+    setUploadedImage(dataUrl);
+    setImageUrl('');
+    setPreviewError(false);
+    event.target.value = '';
   };
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Input
-        onChange={(event) => setInputText(event.target.value)}
-        type="text"
-        value={inputText}
-        placeholder="Add a task..."
-        aria-label="New task"
-      />
-      <Input
-        onChange={(event) => setImageInput(event.target.value)}
-        type="text"
-        value={imageInput}
-        placeholder="Image URL (optional)"
-        aria-label="New task image URL"
-      />
+      <Row>
+        <Input
+          onChange={(event) => setInputText(event.target.value)}
+          type="text"
+          value={inputText}
+          placeholder="Add a task..."
+          aria-label="New task"
+        />
+        <DateInput
+          type="date"
+          value={dueDate}
+          onChange={(event) => setDueDate(event.target.value)}
+          aria-label="Due date (optional)"
+        />
+      </Row>
+      <Row>
+        <Input
+          onChange={handleImageUrlChange}
+          type="text"
+          value={imageUrl}
+          placeholder="Image URL (optional)"
+          aria-label="New task image URL"
+        />
+        <FileLabel>
+          Upload
+          <FileInput type="file" accept="image/*" onChange={handleFileChange} />
+        </FileLabel>
+      </Row>
+      {previewSrc && !previewError && (
+        <Preview
+          src={previewSrc}
+          alt="Task preview"
+          onError={() => setPreviewError(true)}
+        />
+      )}
       <Button type="submit">
         <Span>Add</Span>
       </Button>
@@ -41,9 +88,16 @@ export default TodoForm;
 
 const Form = styled.form`
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 0.75rem;
+`;
+
+const Row = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 `;
 
 const Button = styled.button`
@@ -55,6 +109,7 @@ const Button = styled.button`
   border-radius: 5px;
   background-color: #ffeaa7;
   cursor: pointer;
+  align-self: center;
 `;
 
 const Span = styled.span`
@@ -76,6 +131,34 @@ const Input = styled.input`
   font-family: 'Architects Daughter', cursive;
   font-size: 1rem;
   color: hsla(260, 2%, 25%, 0.7);
-  width: 70%;
-  margin-bottom: 20px;
+  flex: 1;
+  min-width: 0;
 `;
+
+const DateInput = styled(Input)`
+  flex: none;
+  width: auto;
+  font-size: 0.85rem;
+`;
+
+const FileLabel = styled.label`
+  font-family: 'Architects Daughter', cursive;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  background-color: #ffeaa7;
+  cursor: pointer;
+  white-space: nowrap;
+`;
+
+const FileInput = styled.input`
+  display: none;
+`;
+
+const Preview = styled.img`
+  max-height: 4rem;
+  border-radius: 6px;
+  align-self: flex-start;
+  object-fit: cover;
+`;
+
